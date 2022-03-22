@@ -11,7 +11,7 @@ slicesol is a set of utils which adapts to generic go 1.18, makes slice easier t
 
 ## Installation
 
-go get github.com/func25/slicesol
+`go get github.com/func25/slicesol`
 
 ## Samples
 
