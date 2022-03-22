@@ -6,8 +6,8 @@ func (t Sliol[T]) Map(fn func(e T) T) Sliol[T] {
 }
 
 // Map transforms each element of input slice through fn and return a new transformed slice
-func Map[T any](a []T, fn func(e T) T) []T {
-	res := make([]T, len(a))
+func Map[T, K any](a []T, fn func(e T) K) []K {
+	res := make([]K, len(a))
 	for k, v := range a {
 		res[k] = fn(v)
 	}
