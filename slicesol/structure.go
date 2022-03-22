@@ -8,6 +8,11 @@ var (
 )
 
 // Dequeue pops the first element, simulate a queue
+func (t *Sliol[T]) Dequeue() (T, error) {
+	return Dequeue((*[]T)(t))
+}
+
+// Dequeue pops the first element, simulate a queue
 func Dequeue[T any](t *[]T) (T, error) {
 	n := len(*t)
 	if n == 0 {
@@ -22,6 +27,10 @@ func Dequeue[T any](t *[]T) (T, error) {
 // func Push[T any](t *[]T, a T) {
 // 	*t = append(*t, a)
 // }
+
+func (t *Sliol[T]) Pop() (T, error) {
+	return Pop((*[]T)(t))
+}
 
 // Pop pops the last element, simulate a stack
 func Pop[T any](t *[]T) (T, error) {

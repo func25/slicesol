@@ -1,6 +1,12 @@
 package slicesol
 
-// RemoveUnor will CHANGE the original slice
+// RemoveUnor will CHANGE the original slice and its element order also
+func (t *Sliol[T]) RemoveUnor(i int) Sliol[T] {
+	*t = RemoveUnor(*t, i)
+	return *t
+}
+
+// RemoveUnor will CHANGE the original slice and its element order also
 // usage:
 //		arr = RemoveUnor(arr, i)
 // DO NOT:
@@ -19,7 +25,13 @@ func RemoveUnor[T any](a []T, i int) []T {
 	return a
 }
 
-// Remove will CHANGE the original slice
+// Remove will CHANGE the original slice but remain its element order
+func (t *Sliol[T]) Remove(i int) Sliol[T] {
+	*t = Remove(*t, i)
+	return *t
+}
+
+// Remove will CHANGE the original slice but remain its element order
 // usage:
 //		arr = Remove(arr, i)
 // DO NOT:

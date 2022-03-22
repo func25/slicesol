@@ -6,6 +6,11 @@ import (
 )
 
 // Shuffle will return a NEW slice as shuffled version of input slice
+func (t Sliol[T]) Shuffle() Sliol[T] {
+	return Shuffle(t)
+}
+
+// Shuffle will return a NEW slice as shuffled version of input slice
 func Shuffle[T any](slice []T) []T {
 	n := len(slice)
 	if n < 2 {
@@ -17,6 +22,10 @@ func Shuffle[T any](slice []T) []T {
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(n, func(i, j int) { res[i], res[j] = res[j], res[i] })
 	return res
+}
+
+func (t Sliol[T]) ShuffleRef() Sliol[T] {
+	return ShuffleRef(t)
 }
 
 // ShuffleRef changes input slice and returns itself also
