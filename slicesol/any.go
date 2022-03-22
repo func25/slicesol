@@ -16,12 +16,12 @@ func Any[T any](a []T, fn func(T) bool) int {
 	return -1
 }
 
-// IsAny answers the question that "does any element meet fn condition?"
+// IsAny will return true if any element meets fn condition, or -1 if not
 func (t Sliol[T]) IsAny(fn func(T) bool) bool {
 	return IsAny(t, fn)
 }
 
-// IsAny answers the question that "does any element meet fn condition?"
+// IsAny will return true if any element meets fn condition, or -1 if not
 func IsAny[T any](a []T, fn func(T) bool) bool {
 	for _, v := range a {
 		if fn(v) {

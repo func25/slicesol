@@ -1,6 +1,7 @@
 package slicesoltest
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -16,4 +17,26 @@ func TestPipe(t *testing.T) {
 			t.Error("wrong mixed", newSlice)
 		}
 	})
+}
+
+func TestRemoveReadme(t *testing.T) {
+	arr := slicesol.Remove([]int{1, 2, 3, 4, 5}, 0)
+	fmt.Println(arr)
+}
+
+func TestInsertReadme(t *testing.T) {
+	arr := slicesol.Insert([]int{1, 4, 5}, 1, 2, 3)
+	fmt.Println(arr)
+}
+
+func TestPopReadme(t *testing.T) {
+	popArr := &[]int{1, 2, 3, 4, 5}
+	p, err := slicesol.Pop(popArr)
+	fmt.Println(p, err)
+	fmt.Println(popArr)
+
+	deqArr := &[]int{1, 2, 3, 4, 5}
+	d, err := slicesol.Dequeue(deqArr)
+	fmt.Println(d, err)
+	fmt.Println(deqArr)
 }

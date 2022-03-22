@@ -8,11 +8,13 @@ var (
 )
 
 // Dequeue pops the first element, simulate a queue
+// this function will change the original slice
 func (t *Sliol[T]) Dequeue() (T, error) {
 	return Dequeue((*[]T)(t))
 }
 
 // Dequeue pops the first element, simulate a queue
+// this function will change the original slice
 func Dequeue[T any](t *[]T) (T, error) {
 	n := len(*t)
 	if n == 0 {
@@ -28,11 +30,14 @@ func Dequeue[T any](t *[]T) (T, error) {
 // 	*t = append(*t, a)
 // }
 
+// Pop pops the last element, simulate a stack
+// this function will change the original slice
 func (t *Sliol[T]) Pop() (T, error) {
 	return Pop((*[]T)(t))
 }
 
 // Pop pops the last element, simulate a stack
+// this function will change the original slice
 func Pop[T any](t *[]T) (T, error) {
 	n := len(*t)
 	if n == 0 {
