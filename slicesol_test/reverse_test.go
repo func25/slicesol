@@ -6,12 +6,7 @@ import (
 	"github.com/func25/slicesol/slicesol"
 )
 
-type shuffleTestTable[T any] struct {
-	InpArr func() []T
-	Fn     func(arr []T, origin []T) bool
-}
-
-func TestShuffle(t *testing.T) {
+func TestRerverse(t *testing.T) {
 	table := []shuffleTestTable[int]{
 		{
 			InpArr: func() []int { return []int{1} },
@@ -22,13 +17,17 @@ func TestShuffle(t *testing.T) {
 		{
 			InpArr: func() []int { return []int{1, 2, 3, 4, 5} },
 			Fn: func(arr []int, origin []int) bool {
-				for k := range arr {
-					if arr[k] != origin[k] {
-						return true
+				if len(arr) != len(origin) {
+					return false
+				}
+
+				for i, j := 0, len(origin)-1; i < len(arr); i, j = i+1, j-1 {
+					if arr[i] != origin[j] {
+						return false
 					}
 				}
 
-				return false
+				return true
 			},
 		},
 		{
@@ -39,12 +38,12 @@ func TestShuffle(t *testing.T) {
 		},
 	}
 
-	t.Run("Shuffle", func(t *testing.T) {
+	t.Run("Reverse", func(t *testing.T) {
 		for _, v := range table {
 			arr := v.InpArr()
 			origin := v.InpArr()
-			if !v.Fn(slicesol.Shuffle(arr), origin) {
-				t.Error("wrong slicesol.Shuffle")
+			if !v.Fn(slicesol.Reverse(arr), origin) {
+				t.Error("wrong slicesol.Reverse")
 			}
 		}
 	})
