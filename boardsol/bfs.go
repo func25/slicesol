@@ -9,10 +9,8 @@ import (
 var ErrEmptyBoard = errors.New("cannot bfs board with width == 0")
 
 type BFSQuery[T any] struct {
-	IsNextValidFunc func(cur T, next T) bool // condition to add next element into queue
-	SelectHook      func(Vector2D)           // hook on adding element[x][y] into queue
+	SelectCondition func(cur Vector2D, next Vector2D) bool // condition to add next element into queue
 	Face            [][]T
-	Pos             Vector2D
 
 	size       Vector2D
 	directions []Vector2D
@@ -35,23 +33,19 @@ func OptDirections[T any](dirs []Vector2D) BFSOption[T] {
 	}
 }
 
-func BFSAny[T any](q BFSQuery[T], opts ...BFSOption[T]) error {
+func (q *BFSQuery[T]) BFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, error) {
 	for i := range opts {
-		opts[i](&q)
+		opts[i](q)
 	}
 
 	if q.directions == nil {
 		q.directions = _DIRECTIONS
 	}
 
-	if q.SelectHook == nil {
-		q.SelectHook = func(vd Vector2D) {}
-	}
-
 	v0 := Vector2D{}
 	if q.size == v0 {
 		if len(q.Face) == 0 {
-			return ErrEmptyBoard
+			return nil, ErrEmptyBoard
 		}
 		q.size.X, q.size.Y = len(q.Face), len(q.Face[0])
 
@@ -62,16 +56,15 @@ func BFSAny[T any](q BFSQuery[T], opts ...BFSOption[T]) error {
 		}
 	}
 
-	queue := slicesol.Sliol[Vector2D]{Vector2D{q.Pos.X, q.Pos.Y}}
-	exists := map[int]bool{(q.Pos.Y*q.size.X + q.Pos.X): true}
+	queue := slicesol.Sliol[Vector2D]{Vector2D{pos.X, pos.Y}}
+	exists := map[int]bool{(pos.Y*q.size.X + pos.X): true}
+	res := make([]Vector2D, 0)
 
 	for len(queue) > 0 {
 		cur, err := queue.Dequeue()
 		if err != nil {
-			return err
+			return nil, err
 		}
-
-		curValue := q.Face[cur.X][cur.Y]
 
 		for _, dir := range _DIRECTIONS {
 
@@ -79,14 +72,15 @@ func BFSAny[T any](q BFSQuery[T], opts ...BFSOption[T]) error {
 			id1D := next.to1D(q.size.X)
 
 			if !exists[id1D] &&
-				q.IsNextValidFunc(curValue, q.Face[next.X][next.Y]) {
+				q.SelectCondition(cur, next) {
 
-				queue = append(queue)
+				queue = append(queue, next)
 				exists[id1D] = true
-				q.SelectHook(next)
+
+				res = append(res, cur)
 			}
 		}
 	}
 
-	return nil
+	return res, nil
 }
