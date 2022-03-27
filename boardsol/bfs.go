@@ -7,58 +7,40 @@ import (
 )
 
 var ErrEmptyBoard = errors.New("cannot bfs board with width == 0")
+var emptyStruct = struct{}{}
 
-type BFSQuery[T any] struct {
+type SearchQuery[T any] struct {
 	SelectCondition func(cur Vector2D, next Vector2D) bool // condition to add next element into queue
 	Face            [][]T
+	Width           int
 
-	size       Vector2D
-	directions []Vector2D
+	// config
+	directions    []Vector2D
+	genDirections func() []Vector2D // generating new set of directions when executing search
+	limit         int
+	keepExists    bool
+
+	// state
+	exists map[int]struct{}
+	res    []Vector2D
 }
 
-type BFSOption[T any] func(*BFSQuery[T])
-
-func OptSize[T any](width, height int) BFSOption[T] {
-	return func(q *BFSQuery[T]) {
-		q.size = Vector2D{
-			X: width,
-			Y: height,
-		}
-	}
-}
-
-func OptDirections[T any](dirs []Vector2D) BFSOption[T] {
-	return func(q *BFSQuery[T]) {
-		q.directions = dirs
-	}
-}
-
-func (q *BFSQuery[T]) BFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, error) {
+func (q *SearchQuery[T]) BFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, error) {
 	for i := range opts {
 		opts[i](q)
 	}
 
-	if q.directions == nil {
-		q.directions = _DIRECTIONS
+	if q.keepExists && q.exists != nil {
+		if _, exist := q.exists[pos.to1D(q.Width)]; exist {
+			return nil, nil
+		}
 	}
 
-	v0 := Vector2D{}
-	if q.size == v0 {
-		if len(q.Face) == 0 {
-			return nil, ErrEmptyBoard
-		}
-		q.size.X, q.size.Y = len(q.Face), len(q.Face[0])
-
-		for i := 0; i < q.size.X; i++ {
-			if len(q.Face[i]) < q.size.Y {
-				q.size.Y = len(q.Face[i])
-			}
-		}
+	if err := q.validate(pos); err != nil {
+		return nil, err
 	}
 
 	queue := slicesol.Sliol[Vector2D]{Vector2D{pos.X, pos.Y}}
-	exists := map[int]bool{(pos.Y*q.size.X + pos.X): true}
-	res := make([]Vector2D, 0)
 
 	for len(queue) > 0 {
 		cur, err := queue.Dequeue()
@@ -69,18 +51,44 @@ func (q *BFSQuery[T]) BFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, error
 		for _, dir := range _DIRECTIONS {
 
 			next := cur.plus(dir)
-			id1D := next.to1D(q.size.X)
+			id1D := next.to1D(q.Width)
 
-			if !exists[id1D] &&
-				q.SelectCondition(cur, next) {
-
+			if _, exist := q.exists[id1D]; !exist && q.SelectCondition(cur, next) {
 				queue = append(queue, next)
-				exists[id1D] = true
+				q.exists[id1D] = emptyStruct
 
-				res = append(res, cur)
+				q.res = append(q.res, next)
+
+				if q.limit != 0 && len(q.res) > q.limit {
+					return q.res, nil
+				}
 			}
 		}
 	}
 
-	return res, nil
+	return q.res, nil
+}
+
+func (q *SearchQuery[T]) validate(pos Vector2D) error {
+	if q.directions == nil {
+		if q.genDirections != nil {
+			q.directions = q.genDirections()
+		} else {
+			q.directions = _DIRECTIONS
+		}
+	}
+
+	if q.Width == 0 {
+		return ErrEmptyBoard
+	}
+
+	q.res = []Vector2D{{pos.X, pos.Y}}
+
+	if !q.keepExists || q.exists == nil {
+		q.exists = map[int]struct{}{}
+	}
+
+	q.exists[pos.to1D(q.Width)] = emptyStruct
+
+	return nil
 }
