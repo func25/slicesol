@@ -1,7 +1,6 @@
 package boardsoltest
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/func25/slicesol/boardsol"
@@ -19,7 +18,6 @@ func TestDFS(t *testing.T) {
 	}
 
 	q := boardsol.SearchQuery[int]{
-		Face: b,
 		SelectCondition: func(cur, next boardsol.Vector2D) bool {
 			return next.X >= 0 && next.X < len(b) &&
 				next.Y >= 0 && next.Y < len(b[next.X]) &&
@@ -42,9 +40,9 @@ func TestDFS(t *testing.T) {
 				largestGroup = group
 				largestValue = b[group[0].X][group[0].Y]
 			}
-			if len(group) > 0 {
-				fmt.Println(b[i][j], "-", group)
-			}
+			// if len(group) > 0 {
+			// 	fmt.Println(b[i][j], "-", group)
+			// }
 		}
 	}
 
@@ -56,6 +54,6 @@ func TestDFS(t *testing.T) {
 		t.Error(`wrong positions`)
 	}
 
-	fmt.Println(`"lagest" value:`, largestValue)
-	fmt.Println("positions:", largestGroup)
+	// fmt.Println(`"lagest" value:`, largestValue)
+	// fmt.Println("positions:", largestGroup)
 }

@@ -1,10 +1,15 @@
 package boardsol
 
+//DFS returns selected elements that meet specific condition
+//if keepExists == true and the pos was already selected then BFS will return nil slice
 func (q *SearchQuery[T]) DFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, error) {
+	// apply options
 	for i := range opts {
 		opts[i](q)
 	}
 
+	// check if the pos is already iterated before
+	// if true, then return a nil slice
 	if q.keepExists && q.exists != nil {
 		if _, exist := q.exists[pos.to1D(q.Width)]; exist {
 			return nil, nil

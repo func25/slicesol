@@ -9,22 +9,29 @@ import (
 var ErrEmptyBoard = errors.New("cannot bfs board with width == 0")
 var emptyStruct = struct{}{}
 
+//SearchQuery is used for implementing bf-search, df-search
 type SearchQuery[T any] struct {
 	SelectCondition func(cur Vector2D, next Vector2D) bool // condition to add next element into queue
-	Face            [][]T
-	Width           int
+	Width           int                                    // width of the board
 
 	// config
-	directions    []Vector2D
-	genDirections func() []Vector2D // generating new set of directions when executing search
-	limit         int
-	keepExists    bool
+
+	// directions: Which directions should the query check?
+	// by default, there are 4: up, down, left and right
+	directions []Vector2D
+
+	// genDirections: if you want to generate new set of directions each time searching at specific element
+	genDirections func() []Vector2D
+	limit         int  // limit the number of the selected elements
+	keepExists    bool // cache the selected elements of previous calls
 
 	// state
-	exists map[int]struct{}
-	res    []Vector2D
+	exists map[int]struct{} // to not iterate over already selected cells
+	res    []Vector2D       // results
 }
 
+//BFS returns selected elements that meet specific condition
+//if keepExists == true and the pos was already selected then BFS will return nil slice
 func (q *SearchQuery[T]) BFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, error) {
 	for i := range opts {
 		opts[i](q)
