@@ -1,7 +1,6 @@
 package slicesoltest
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/func25/slicesol/slicesol"
@@ -23,7 +22,6 @@ func TestShuffle(t *testing.T) {
 		{
 			InpArr: func() []int { return []int{1, 2, 3, 4, 5} },
 			Fn: func(arr []int, origin []int) bool {
-				fmt.Println(arr)
 				for k := range arr {
 					if arr[k] != origin[k] {
 						return true
@@ -44,18 +42,9 @@ func TestShuffle(t *testing.T) {
 	t.Run("Shuffle", func(t *testing.T) {
 		for _, v := range table {
 			arr := v.InpArr()
-			if !v.Fn(slicesol.Shuffle(arr), arr) {
+			origin := v.InpArr()
+			if !v.Fn(slicesol.Shuffle(arr), origin) {
 				t.Error("wrong slicesol.Shuffle")
-			}
-		}
-	})
-
-	t.Run("Shuffle with Ref", func(t *testing.T) {
-		for _, v := range table {
-			arr := v.InpArr()
-			slicesol.ShuffleRef(arr)
-			if !v.Fn(slicesol.ShuffleRef(arr), v.InpArr()) {
-				t.Error("wrong slicesol.ShuffleRef")
 			}
 		}
 	})

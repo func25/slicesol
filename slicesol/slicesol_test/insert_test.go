@@ -57,6 +57,7 @@ func TestInsert(t *testing.T) {
 			if !v.Fn(slicesol.Insert(arr, v.InpID, v.Insertion...)) {
 				t.Error(fmt.Sprintf("wrong slicesol.Insert: %v, test case %d", v.InpArr(), k))
 			}
+			fmt.Println(arr)
 		}
 	})
 }

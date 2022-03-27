@@ -3,8 +3,9 @@ package slicesol
 // Insert inserts elems to a at i (index)
 // if i > len(elems) than result will be extended
 // so Insert([1,2,3], 4, [5, 6]) will return [1, 2, 3, 0, 5, 6]
-func (t Sliol[T]) Insert(i int, elems ...T) Sliol[T] {
-	return Insert(t, i, elems...)
+func (t *Sliol[T]) Insert(i int, elems ...T) Sliol[T] {
+	*t = Insert(*t, i, elems...)
+	return *t
 }
 
 // Insert inserts elems to a at i (index)
