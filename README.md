@@ -72,3 +72,62 @@ newSlice := arr.
             Map(func(e int) int { return e * 2 })
 // newSlice: [4, 8, 12, 16, 20]
 ```
+
+## BFS, DFS
+This lib also supports Breadth first search (BFS) and  Depth first search (DFS) for 2D matrix, let see:
+
+This example will show all areas that have the same value:
+```go
+// 1. let's create a sample board and initial variables:
+b := [][]int{
+ {1, 1, 3, 3, 3},
+ {2, 1, 1, 4, 3},
+ {2, 2, 1, 4, 3},
+ {2, 2, 1, 1, 5},
+ {5, 5, 5, 4, 5},
+ {1, 2, 3, 4, 5},
+}
+largestGroup := []boardsol.Vector2D{}
+largestValue := -1
+
+// 2. create our search query
+q := (&boardsol.SearchQuery[int]{
+
+ // the condition to check whether the next element can be grouped with current element or not
+	SelectCondition: func(cur, next boardsol.Vector2D) bool {
+		return next.X >= 0 && next.X < len(b) &&
+			next.Y >= 0 && next.Y < len(b[next.X]) &&
+			b[cur.X][cur.Y] == b[next.X][next.Y]
+	},
+	Width: len(b),
+}).ApplyOpts(boardsol.OptCacheSelectedElements[int](true))
+
+// 3. Run the dfs/bfs 
+for i := 0; i < len(b); i++ {
+ for j := 0; j < len(b[i]); j++ {
+  group, err := q.BFS(boardsol.Vector2D{X: i, Y: j})
+  if err != nil {
+   t.Fatal(err)
+  }
+  if len(group) > len(largestGroup) {
+   largestGroup = group
+   largestValue = b[group[0].X][group[0].Y]
+  }
+ }
+}
+
+fmt.Println(largestValue); // 1
+fmt.Println(largestGroup); // [{0 0} {0 1} {1 1} {1 2} {2 2} {3 2} {3 3}]
+```
+
+Btw, at step 3, you can use Iterate() for more convenient:
+
+```go
+largestGroup, largestValue := []boardsol.Vector2D{}, -1
+q.Iterate(b, func(group []boardsol.Vector2D) {
+ if len(group) > len(largestGroup) {
+  largestGroup = group
+  largestValue = b[group[0].X][group[0].Y]
+ }
+})
+```
