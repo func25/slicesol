@@ -32,7 +32,7 @@ type SearchQuery[T any] struct {
 
 //BFS returns selected elements that meet specific condition
 //if keepExists == true and the pos was already selected then BFS will return nil slice
-func (q *SearchQuery[T]) BFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, error) {
+func (q *SearchQuery[T]) BFS(pos Vector2D, opts ...SearchOption[T]) ([]Vector2D, error) {
 	for i := range opts {
 		opts[i](q)
 	}
@@ -106,4 +106,34 @@ func (q *SearchQuery[T]) validate(pos Vector2D) error {
 func (q *SearchQuery[T]) Reset() {
 	q.res = make([]Vector2D, 0)
 	q.exists = make(map[int]struct{})
+}
+
+func (q *SearchQuery[T]) Iterate(board [][]T, fn func(group []Vector2D), opts ...IterateOption) error {
+	cfg := (&iterateConfig{}).applyOpts(opts...)
+	customSize := false
+	if cfg.size != (Vector2D{}) {
+		customSize = true
+	}
+
+	width := len(board)
+	if customSize {
+		width = cfg.size.X
+	}
+
+	for i := 0; i < width; i++ {
+		lenY := len(board[i])
+		if customSize && lenY > cfg.size.Y {
+			lenY = cfg.size.Y
+		}
+
+		for j := 0; j < lenY; j++ {
+			if group, err := q.BFS(Vector2D{X: i, Y: j}); err != nil {
+				return err
+			} else {
+				fn(group)
+			}
+		}
+	}
+
+	return nil
 }
