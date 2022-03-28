@@ -8,6 +8,7 @@ slicesol is a set of utils which adapts to generic go 1.18, makes slice easier t
 - [Functions](#functions)
   * [Built-in functions](#built-in-functions)
   * [Using as PIPE](#using-as-pipe)
+- [BFS, DFS](#bfs-dfs)
 
 ## Installation
 
@@ -74,9 +75,9 @@ newSlice := arr.
 ```
 
 ## BFS, DFS
-This lib also supports Breadth first search (BFS) and  Depth first search (DFS) for 2D matrix, let see:
+This lib also supports Breadth first search (BFS) and Depth first search (DFS) for 2D matrix, let see:
 
-This example will show all areas that have the same value:
+This example will show the largest area which has elements that have the same value
 ```go
 // 1. let's create a sample board and initial variables:
 b := [][]int{
@@ -87,8 +88,7 @@ b := [][]int{
  {5, 5, 5, 4, 5},
  {1, 2, 3, 4, 5},
 }
-largestGroup := []boardsol.Vector2D{}
-largestValue := -1
+largestGroup, largestValue := []boardsol.Vector2D{}, -1
 
 // 2. create our search query
 q := (&boardsol.SearchQuery[int]{
@@ -102,7 +102,7 @@ q := (&boardsol.SearchQuery[int]{
 	Width: len(b),
 }).ApplyOpts(boardsol.OptCacheSelectedElements[int](true))
 
-// 3. Run the dfs/bfs 
+// 3. Run the dfs/bfs on all elements
 for i := 0; i < len(b); i++ {
  for j := 0; j < len(b[i]); j++ {
   group, err := q.BFS(boardsol.Vector2D{X: i, Y: j})
