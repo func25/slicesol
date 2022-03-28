@@ -1,7 +1,7 @@
 package boardsol
 
 //DFS returns selected elements that meet specific condition
-//if keepExists == true and the pos was already selected then BFS will return nil slice
+//if cacheElements == true and the pos was already selected then BFS will return nil slice
 func (q *SearchQuery[T]) DFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, error) {
 	// apply options
 	for i := range opts {

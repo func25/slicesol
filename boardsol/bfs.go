@@ -37,6 +37,8 @@ func (q *SearchQuery[T]) BFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, er
 		opts[i](q)
 	}
 
+	// if cacheElements and the pos was already selected in previous calls
+	// return nil slice
 	if q.cacheElements && q.exists != nil {
 		if _, exist := q.exists[pos.To1D(q.Width)]; exist {
 			return nil, nil
