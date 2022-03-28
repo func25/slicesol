@@ -28,10 +28,10 @@ func OptGenDirections[T any](fn func() []Vector2D) BFSOption[T] {
 	}
 }
 
-//OptKeepExists set true to not iterate over selected elements of previous BFS/DFS calls
+//OptCacheSelectedElements set equal to true to not iterate over selected elements of previous BFS/DFS calls
 //if you pass the selected element into the query, it will return nil slice
-func OptKeepExists[T any](keepExists bool) BFSOption[T] {
+func OptCacheSelectedElements[T any](cacheElements bool) BFSOption[T] {
 	return func(q *SearchQuery[T]) {
-		q.keepExists = keepExists
+		q.cacheElements = cacheElements
 	}
 }

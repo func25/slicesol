@@ -23,7 +23,7 @@ type SearchQuery[T any] struct {
 	// genDirections: if you want to generate new set of directions each time searching at specific element
 	genDirections func() []Vector2D
 	limit         int  // limit the number of the selected elements
-	keepExists    bool // cache the selected elements of previous calls
+	cacheElements bool // cache the selected elements of previous calls
 
 	// state
 	exists map[int]struct{} // to not iterate over already selected cells
@@ -37,8 +37,10 @@ func (q *SearchQuery[T]) BFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, er
 		opts[i](q)
 	}
 
-	if q.keepExists && q.exists != nil {
-		if _, exist := q.exists[pos.to1D(q.Width)]; exist {
+	// if cacheElements and the pos was already selected in previous calls
+	// return nil slice
+	if q.cacheElements && q.exists != nil {
+		if _, exist := q.exists[pos.To1D(q.Width)]; exist {
 			return nil, nil
 		}
 	}
@@ -57,8 +59,8 @@ func (q *SearchQuery[T]) BFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, er
 
 		for _, dir := range _DIRECTIONS {
 
-			next := cur.plus(dir)
-			id1D := next.to1D(q.Width)
+			next := cur.Plus(dir)
+			id1D := next.To1D(q.Width)
 
 			if _, exist := q.exists[id1D]; !exist && q.SelectCondition(cur, next) {
 				queue = append(queue, next)
@@ -91,11 +93,17 @@ func (q *SearchQuery[T]) validate(pos Vector2D) error {
 
 	q.res = []Vector2D{{pos.X, pos.Y}}
 
-	if !q.keepExists || q.exists == nil {
+	if !q.cacheElements || q.exists == nil {
 		q.exists = map[int]struct{}{}
 	}
 
-	q.exists[pos.to1D(q.Width)] = emptyStruct
+	q.exists[pos.To1D(q.Width)] = emptyStruct
 
 	return nil
+}
+
+//Reset uses to reset the query state like result, selected elements of previous calls
+func (q *SearchQuery[T]) Reset() {
+	q.res = make([]Vector2D, 0)
+	q.exists = make(map[int]struct{})
 }
