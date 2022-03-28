@@ -10,8 +10,8 @@ func (q *SearchQuery[T]) DFS(pos Vector2D, opts ...BFSOption[T]) ([]Vector2D, er
 
 	// check if the pos is already iterated before
 	// if true, then return a nil slice
-	if q.keepExists && q.exists != nil {
-		if _, exist := q.exists[pos.to1D(q.Width)]; exist {
+	if q.cacheElements && q.exists != nil {
+		if _, exist := q.exists[pos.To1D(q.Width)]; exist {
 			return nil, nil
 		}
 	}
@@ -35,8 +35,8 @@ func (q *SearchQuery[T]) internalDFS(curPos Vector2D) bool {
 	}
 
 	for _, dir := range dirs {
-		newPos := curPos.plus(dir)
-		id1D := newPos.to1D(q.Width)
+		newPos := curPos.Plus(dir)
+		id1D := newPos.To1D(q.Width)
 		if _, exist := q.exists[id1D]; !exist && q.SelectCondition(curPos, newPos) {
 			q.res = append(q.res, newPos)
 			q.exists[id1D] = emptyStruct

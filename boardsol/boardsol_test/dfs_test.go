@@ -26,7 +26,7 @@ func TestDFS(t *testing.T) {
 		Width: len(b),
 	}
 
-	q.ApplyOpts(boardsol.OptKeepExists[int](true))
+	q.ApplyOpts(boardsol.OptCacheSelectedElements[int](true))
 
 	largestGroup := []boardsol.Vector2D{}
 	largestValue := -1
