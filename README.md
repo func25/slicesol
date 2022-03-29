@@ -100,7 +100,7 @@ q := (&boardsol.SearchQuery[int]{
 			b[cur.X][cur.Y] == b[next.X][next.Y]
 	},
 	Width: len(b),
-}).ApplyOpts(boardsol.OptCacheSelectedElements[int](true))
+}).ApplyOpts(boardsol.OptCacheSelected[int](true))
 
 // 3. Run the dfs/bfs on all elements
 for i := 0; i < len(b); i++ {

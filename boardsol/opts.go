@@ -30,22 +30,31 @@ func OptGenDirections[T any](fn func() []Vector2D) SearchOption[T] {
 	}
 }
 
-//OptCacheSelectedElements set equal to true to not iterate over selected elements of previous BFS/DFS calls
+//OptCacheSelected set equal to true to not iterate over selected elements of previous BFS/DFS calls
 //if you pass the selected element into the query, it will return nil slice
-func OptCacheSelectedElements[T any](cacheElements bool) SearchOption[T] {
+func OptCacheSelected[T any](cacheSelected bool) SearchOption[T] {
 	return func(q *SearchQuery[T]) {
-		q.cacheElements = cacheElements
+		q.cacheSelected = cacheSelected
 	}
 }
+
+var justTrue = func(Vector2D) bool { return true }
 
 type IterateOption func(*iterateConfig)
 
 type iterateConfig struct {
-	isBFS bool
-	size  Vector2D
+	isDFS       bool
+	size        Vector2D
+	selectFirst func(Vector2D) bool
 }
 
-func (c *iterateConfig) applyOpts(opts ...IterateOption) *iterateConfig {
+func (c *iterateConfig) applyFrom(opts ...IterateOption) *iterateConfig {
+	*c = iterateConfig{
+		isDFS:       false,
+		size:        Vector2D{},
+		selectFirst: justTrue,
+	}
+
 	for i := range opts {
 		opts[i](c)
 	}
@@ -53,15 +62,21 @@ func (c *iterateConfig) applyOpts(opts ...IterateOption) *iterateConfig {
 	return c
 }
 
-func IOptBFS(isBFS bool) IterateOption {
+func IOptDFS(isDFS bool) IterateOption {
 	return func(q *iterateConfig) {
-		q.isBFS = isBFS
+		q.isDFS = isDFS
 	}
 }
 
 func IOptCustomSize(size Vector2D) IterateOption {
 	return func(q *iterateConfig) {
 		q.size = size
+	}
+}
+
+func IOptFirstCondition(fn func(Vector2D) bool) IterateOption {
+	return func(q *iterateConfig) {
+		q.selectFirst = fn
 	}
 }
 

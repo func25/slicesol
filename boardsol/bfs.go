@@ -23,7 +23,7 @@ type SearchQuery[T any] struct {
 	// genDirections: if you want to generate new set of directions each time searching at specific element
 	genDirections func() []Vector2D
 	limit         int  // limit the number of the selected elements
-	cacheElements bool // cache the selected elements of previous calls
+	cacheSelected bool // cache the selected elements of previous calls
 
 	// state
 	exists map[int]struct{} // to not iterate over already selected cells
@@ -39,7 +39,7 @@ func (q *SearchQuery[T]) BFS(pos Vector2D, opts ...SearchOption[T]) ([]Vector2D,
 
 	// if cacheElements and the pos was already selected in previous calls
 	// return nil slice
-	if q.cacheElements && q.exists != nil {
+	if q.cacheSelected && q.exists != nil {
 		if _, exist := q.exists[pos.To1D(q.Width)]; exist {
 			return nil, nil
 		}
@@ -93,7 +93,7 @@ func (q *SearchQuery[T]) validate(pos Vector2D) error {
 
 	q.res = []Vector2D{{pos.X, pos.Y}}
 
-	if !q.cacheElements || q.exists == nil {
+	if !q.cacheSelected || q.exists == nil {
 		q.exists = map[int]struct{}{}
 	}
 
@@ -109,15 +109,20 @@ func (q *SearchQuery[T]) Reset() {
 }
 
 func (q *SearchQuery[T]) Iterate(board [][]T, fn func(group []Vector2D), opts ...IterateOption) error {
-	cfg := (&iterateConfig{}).applyOpts(opts...)
+	cfg := (&iterateConfig{}).applyFrom(opts...)
+
+	// custom size
 	customSize := false
+	width := len(board)
 	if cfg.size != (Vector2D{}) {
 		customSize = true
+		width = cfg.size.X
 	}
 
-	width := len(board)
-	if customSize {
-		width = cfg.size.X
+	// custom query
+	query := q.BFS
+	if cfg.isDFS {
+		query = q.DFS
 	}
 
 	for i := 0; i < width; i++ {
@@ -127,7 +132,12 @@ func (q *SearchQuery[T]) Iterate(board [][]T, fn func(group []Vector2D), opts ..
 		}
 
 		for j := 0; j < lenY; j++ {
-			if group, err := q.BFS(Vector2D{X: i, Y: j}); err != nil {
+			pos := Vector2D{X: i, Y: j}
+			if !cfg.selectFirst(pos) {
+				continue
+			}
+
+			if group, err := query(pos); err != nil {
 				return err
 			} else {
 				fn(group)

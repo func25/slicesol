@@ -25,7 +25,7 @@ func TestBFS(t *testing.T) {
 		Width: len(b),
 	}
 
-	q.ApplyOpts(boardsol.OptCacheSelectedElements[int](true))
+	q.ApplyOpts(boardsol.OptCacheSelected[int](true))
 
 	largestGroup := []boardsol.Vector2D{}
 	largestValue := -1
@@ -67,7 +67,7 @@ func TestBFSIterator(t *testing.T) {
 				b[cur.X][cur.Y] == b[next.X][next.Y]
 		},
 		Width: len(b),
-	}).ApplyOpts(boardsol.OptCacheSelectedElements[int](true))
+	}).ApplyOpts(boardsol.OptCacheSelected[int](true))
 
 	largestGroup, largestValue := []boardsol.Vector2D{}, -1
 	q.Iterate(b, func(group []boardsol.Vector2D) {

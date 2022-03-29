@@ -10,7 +10,7 @@ func (q *SearchQuery[T]) DFS(pos Vector2D, opts ...SearchOption[T]) ([]Vector2D,
 
 	// check if the pos is already iterated before
 	// if true, then return a nil slice
-	if q.cacheElements && q.exists != nil {
+	if q.cacheSelected && q.exists != nil {
 		if _, exist := q.exists[pos.To1D(q.Width)]; exist {
 			return nil, nil
 		}
