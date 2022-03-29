@@ -4,7 +4,7 @@ type Vector2D struct {
 	X, Y int
 }
 
-func (pos Vector2D) IsBound(size Vector2D) bool {
+func (pos Vector2D) IsInsideOXY(size Vector2D) bool {
 	return pos.X >= 0 && pos.X < size.X && pos.Y >= 0 && pos.Y < size.Y
 }
 
