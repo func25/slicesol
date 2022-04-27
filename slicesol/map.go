@@ -14,3 +14,24 @@ func Map[T, K any](a []T, fn func(e T) K) []K {
 
 	return res
 }
+
+// MapWithError transforms each element of input slice through fn and return a new transformed slice
+//It were interupted if any error occured
+func (t Sliol[T]) MapErr(fn func(e T) (T, error)) (Sliol[T], error) {
+	return MapErr(t, fn)
+}
+
+// MapWithError transforms each element of input slice through fn and return a new transformed slice
+//It were interupted if any error occured
+func MapErr[T, K any](a []T, fn func(e T) (K, error)) ([]K, error) {
+	var err error
+	res := make([]K, len(a))
+	for k, v := range a {
+		res[k], err = fn(v)
+		if err != nil {
+			return res, err
+		}
+	}
+
+	return res, nil
+}
